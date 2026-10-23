@@ -26,12 +26,14 @@ public:
 
         for (int i = 0; i < v.size(); i++)
         {
-            if (!v[i].isFree || v[i].size < bytes) continue;
+            if (!v[i].isFree || v[i].size < bytes)
+                continue;
 
-            void* address = v[i].address;
+            void *address = v[i].address;
             size_t size = v[i].size;
 
-            if (v[i].size == bytes) {
+            if (v[i].size == bytes)
+            {
                 v[i].isFree = false;
                 return v[i].address;
             }
@@ -39,7 +41,7 @@ public:
             v[i].size = bytes;
             v[i].isFree = false;
 
-            void* newAddress = static_cast<byte*>(address) + bytes;
+            void *newAddress = static_cast<byte *>(address) + bytes;
             size_t newSize = size - bytes;
 
             v.push_back({newAddress, newSize, true});
@@ -73,14 +75,22 @@ public:
     }
 
     // Coalescing free blocks into one block
-    void coalesce() {
-        for (size_t i = 0; i + 1 < v.size();) {
-            void* expectedAddress = static_cast<byte*>(v[i].address) + v[i].size;
-            if (v[i].isFree && v[i+1].isFree && v[i+1].address == expectedAddress) {
-                v[i].size += v[i+1].size;
-                v.erase(v.begin() + i + 1);
-            } else {
-                i++;
+    void coalesce()
+    {
+        for (size_t i = 0; i < v.size(); i++)
+        {
+            for (size_t j = i + 1; j < v.size();)
+            {
+                void *expectedAddress = static_cast<byte *>(v[i].address) + v[i].size;
+                if (v[i].isFree && v[j].isFree && v[j].address == expectedAddress)
+                {
+                    v[i].size += v[j].size;
+                    v.erase(v.begin() + j);
+                }
+                else
+                {
+                    j++;
+                }
             }
         }
     }
