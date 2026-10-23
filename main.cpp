@@ -66,12 +66,23 @@ public:
             if (block.address == p && !block.isFree)
             {
                 block.isFree = true;
-                return;
+                break;
             }
         }
+        coalesce();
+    }
 
-        
-        
+    // Coalescing free blocks into one block
+    void coalesce() {
+        for (size_t i = 0; i + 1 < v.size();) {
+            void* expectedAddress = static_cast<byte*>(v[i].address) + v[i].size;
+            if (v[i].isFree && v[i+1].isFree && v[i+1].address == expectedAddress) {
+                v[i].size += v[i+1].size;
+                v.erase(v.begin() + i + 1);
+            } else {
+                i++;
+            }
+        }
     }
 
     void reset()
@@ -86,32 +97,17 @@ int main()
 {
     MemoryAllocator m;
 
-    void *p1 = m.allocate(4);
-    void *p2 = m.allocate(5);
+    void *p1 = m.allocate(2);
+    void *p2 = m.allocate(2);
+    void *p3 = m.allocate(4);
 
     m.deallocate(p1);
+    m.deallocate(p2);
 
-    void *p3 = m.allocate(2);
-    void *p4 = m.allocate(2);
+    void *p4 = m.allocate(4);
 
     cout << "p1: " << p1 << '\n';
     cout << "p2: " << p2 << '\n';
     cout << "p3: " << p3 << '\n';
     cout << "p4: " << p4 << '\n';
-    // while (true)
-    // {
-    //     cout << "Enter amount of space you want to allocate!\n";
-    //     int x;
-    //     cin >> x;
-    //     void *p = m.allocate(x);
-
-    //     if (p == nullptr)
-    //     {
-    //         cout << "No space remaining!";
-    //     }
-    //     else
-    //     {
-    //         cout << "space reserved at " << p;
-    //     }
-    // }
 }
